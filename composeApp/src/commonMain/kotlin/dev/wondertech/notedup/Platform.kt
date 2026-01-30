@@ -1,7 +1,0 @@
-package dev.wondertech.notedup
-
-interface Platform {
-    val name: String
-}
-
-expect fun getPlatform(): Platform
