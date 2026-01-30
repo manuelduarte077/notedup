@@ -31,8 +31,6 @@
 		};
 		C890A410263652E722FA3845 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
