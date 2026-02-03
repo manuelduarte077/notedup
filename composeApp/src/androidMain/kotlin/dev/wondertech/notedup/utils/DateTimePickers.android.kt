@@ -2,6 +2,7 @@ package dev.wondertech.notedup.utils
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.graphics.Color.parseColor
 import android.view.ContextThemeWrapper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -114,5 +115,5 @@ private fun convertTo12Hour(hour24: Int): Pair<Int, String> {
  * Convert hex color string to Android Color integer
  */
 private fun hexToColor(hex: String): Int {
-    return android.graphics.Color.parseColor(hex)
+    return parseColor(hex)
 }
