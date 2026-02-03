@@ -16,8 +16,6 @@ actual class DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver {
         val driver = NativeSqliteDriver(NotedUpDatabase.Schema, "notedup.db")
 
-        // Migration: Add isTaskDone column if it doesn't exist
-        // This handles databases created before the column was added
         try {
             driver.executeQuery(null, "SELECT isTaskDone FROM Task LIMIT 1", { cursor ->
                 cursor.next()

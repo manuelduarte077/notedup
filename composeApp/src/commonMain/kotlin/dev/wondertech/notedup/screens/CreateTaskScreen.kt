@@ -1,39 +1,11 @@
 package dev.wondertech.notedup.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,11 +19,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import dev.wondertech.notedup.common.DeleteConfirmationDialog
-import dev.wondertech.notedup.navigation.BottomNavTab
 import dev.wondertech.notedup.common.NotedUpTopAppBar
 import dev.wondertech.notedup.database.LocalDatabase
 import dev.wondertech.notedup.modal.TaskData
 import dev.wondertech.notedup.modal.TaskItem
+import dev.wondertech.notedup.navigation.BottomNavTab
 import dev.wondertech.notedup.notifications.rememberNotificationScheduler
 import dev.wondertech.notedup.preferences.AppSettings
 import dev.wondertech.notedup.preferences.getPreferencesManager
@@ -62,17 +34,8 @@ import dev.wondertech.notedup.utils.currentTimeMillis
 import dev.wondertech.notedup.utils.todayDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
-import notedup.composeapp.generated.resources.Res
-import notedup.composeapp.generated.resources.calendar
-import notedup.composeapp.generated.resources.clock
-import notedup.composeapp.generated.resources.close_icon
-import notedup.composeapp.generated.resources.delete_icon
-import notedup.composeapp.generated.resources.tick_icon
+import kotlinx.datetime.*
+import notedup.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import kotlin.time.ExperimentalTime
 
@@ -88,14 +51,10 @@ class CreateTaskScreen(
         val tabNavigator = LocalTabNavigator.current
         val databaseHelper = LocalDatabase.current
 
-        // Determine if we're in edit mode
         val isEditMode = taskTimestampToEdit != null
         var existingTask by remember { mutableStateOf<TaskData?>(null) }
-
-        // Check if we can go back (navigator size > 1 means we're not at root)
         val canNavigateBack = navigator.size > 1
 
-        // Load existing task if in edit mode
         LaunchedEffect(taskTimestampToEdit) {
             if (taskTimestampToEdit != null) {
                 try {
@@ -112,14 +71,14 @@ class CreateTaskScreen(
         var selectedDate by remember {
             val today = todayDate()
             mutableStateOf(
-                "${today.year}-${today.monthNumber.toString().padStart(2, '0')}-${
-                    today.dayOfMonth.toString().padStart(2, '0')
+                "${today.year}-${today.month.number.toString().padStart(2, '0')}-${
+                    today.day.toString().padStart(2, '0')
                 }"
             )
         }
         // Default time is 1 hour ahead of current time
         var selectedHour by remember {
-            val now = Instant.fromEpochMilliseconds(currentTimeMillis())
+            val now = kotlin.time.Instant.fromEpochMilliseconds(currentTimeMillis())
             val currentDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
             val oneHourLater = currentDateTime.hour + 1
             val hour24 = if (oneHourLater >= 24) oneHourLater - 24 else oneHourLater
@@ -137,7 +96,7 @@ class CreateTaskScreen(
             mutableStateOf(currentDateTime.minute)
         }
         var selectedAmPm by remember {
-            val now = Instant.fromEpochMilliseconds(currentTimeMillis())
+            val now = kotlin.time.Instant.fromEpochMilliseconds(currentTimeMillis())
             val currentDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
             val oneHourLater = currentDateTime.hour + 1
             val hour24 = if (oneHourLater >= 24) oneHourLater - 24 else oneHourLater
@@ -149,8 +108,8 @@ class CreateTaskScreen(
             }
             mutableStateOf(amPm)
         }
-        var isMeetingTask by remember { mutableStateOf(false) } // Meeting toggle
-        var meetingLink by remember { mutableStateOf("") }       // Meeting link field
+        var isMeetingTask by remember { mutableStateOf(false) }
+        var meetingLink by remember { mutableStateOf("") }
 
         // Picker dialog states
         var showDatePicker by remember { mutableStateOf(false) }
@@ -193,7 +152,6 @@ class CreateTaskScreen(
         }
 
         fun formatDateDisplay(dateString: String): String {
-            // Convert "2024-12-15" to "Dec 15, 2024"
             val parts = dateString.split("-")
             if (parts.size != 3) return dateString
             val year = parts[0]
@@ -211,7 +169,6 @@ class CreateTaskScreen(
             return "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} $amPm"
         }
 
-        // Pre-fill form when task is loaded in edit mode
         LaunchedEffect(existingTask) {
             existingTask?.let { task ->
                 taskTitle = task.title
@@ -268,9 +225,8 @@ class CreateTaskScreen(
                     },
                     onOtherIconClick = {
                         if (taskTitle.isNotBlank() && selectedDate.isNotBlank()) {
-                            if (isSaving) return@NotedUpTopAppBar  // Prevent double-clicks
+                            if (isSaving) return@NotedUpTopAppBar
 
-                            // Validate meeting link if provided
                             if (isMeetingTask && meetingLink.trim().isNotEmpty()) {
                                 val urlPattern = "^(https?://|www\\.).+".toRegex(RegexOption.IGNORE_CASE)
                                 if (!meetingLink.trim().matches(urlPattern)) {
@@ -324,9 +280,8 @@ class CreateTaskScreen(
                                             hour24, selectedMinute, 0, 0
                                         )
 
-                                        // Convert to timestamp in milliseconds (or use existing in edit mode)
                                         val timestampMillis = if (isEditMode) {
-                                            taskTimestampToEdit!!  // Use existing timestamp in edit mode
+                                            taskTimestampToEdit
                                         } else {
                                             localDateTime
                                                 .toInstant(TimeZone.currentSystemDefault())
@@ -334,20 +289,17 @@ class CreateTaskScreen(
                                         }
 
 
-                                        // Create task items from checklist
                                         val taskItems = if (isEditMode) {
-                                            // In edit mode, preserve existing task item IDs and completion status
                                             val existingItems = existingTask?.taskList ?: emptyList()
                                             taskDetailItems
                                                 .filter { it.isNotBlank() }
                                                 .mapIndexed { index, text ->
-                                                    // Try to find matching existing item by index or text
                                                     val existingItem = existingItems.getOrNull(index)
                                                     val itemId = existingItem?.id ?: "${timestampMillis}_item_$index"
                                                     val isCompleted = if (existingItem?.text == text) {
                                                         existingItem.isCompleted
                                                     } else {
-                                                        false  // New or modified items are not completed
+                                                        false
                                                     }
 
                                                     TaskItem(
@@ -357,7 +309,6 @@ class CreateTaskScreen(
                                                     )
                                                 }
                                         } else {
-                                            // Create mode - all new items
                                             taskDetailItems
                                                 .filter { it.isNotBlank() }
                                                 .mapIndexed { index, text ->
@@ -370,8 +321,6 @@ class CreateTaskScreen(
                                         }
 
                                         val completedCount = taskItems.count { it.isCompleted }
-
-                                        // Create task data
                                         val taskData = TaskData(
                                             timestampMillis = timestampMillis,
                                             title = taskTitle,
@@ -382,23 +331,18 @@ class CreateTaskScreen(
                                             meetingLink = if (isMeetingTask) meetingLink.trim() else ""
                                         )
 
-                                        // Save to database
                                         if (isEditMode) {
                                             databaseHelper.updateTask(taskData)
                                         } else {
                                             databaseHelper.insertTask(taskData)
                                         }
 
-                                        // Handle notification scheduling
                                         try {
-                                            // Always cancel existing notification
                                             notificationScheduler.cancelNotification(taskData.timestampMillis)
 
-                                            // Reschedule if not done
                                             if (!taskData.isDone) {
                                                 val hasPermission = notificationScheduler.checkPermissionStatus()
                                                 if (hasPermission) {
-                                                    // Use universal scheduling that respects notification preferences
                                                     notificationScheduler.scheduleTaskNotification(
                                                         taskData,
                                                         settings.notificationsEnabled
@@ -411,13 +355,10 @@ class CreateTaskScreen(
                                             e.printStackTrace()
                                         }
 
-                                        // Navigate back only on success
                                         if (isEditMode) {
-                                            // Pop twice: CreateTaskScreen -> PreviewTaskScreen -> MainScreen
                                             navigator.pop()
                                             navigator.pop()
                                         } else {
-                                            // Pop once and navigate to Home tab
                                             navigator.pop()
                                             tabNavigator.current = BottomNavTab.HomeTab
                                         }
@@ -432,7 +373,6 @@ class CreateTaskScreen(
                                 }
                             }
                         } else {
-                            // Show validation error
                             errorMessage = when {
                                 taskTitle.isBlank() -> "Please enter a task title"
                                 selectedDate.isBlank() -> "Please enter a deadline date"
@@ -442,20 +382,19 @@ class CreateTaskScreen(
                     }
                 )
 
-                // Error message display
                 errorMessage?.let { message ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                color = Color(0xFFFFCDD2), // Light red background
+                                color = Color(0xFFFFCDD2),
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .padding(12.dp)
                     ) {
                         Text(
                             text = message,
-                            color = Color(0xFFC62828), // Dark red text
+                            color = Color(0xFFC62828),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -482,15 +421,12 @@ class CreateTaskScreen(
                             checked = isMeetingTask,
                             onCheckedChange = { enabled ->
                                 if (enabled) {
-                                    // When enabling meeting toggle, check if permission is granted
                                     coroutineScope.launch {
                                         val hasPermission = notificationScheduler.checkPermissionStatus()
                                         if (hasPermission) {
-                                            // Have permission, enable the toggle
                                             println("CreateTask: Permission granted, enabling meeting toggle")
                                             isMeetingTask = true
                                         } else {
-                                            // No permission, show warning and don't enable
                                             println("CreateTask: Permission not granted, cannot enable meeting")
                                             errorMessage =
                                                 "Please enable notification permission in Settings to use meeting reminders"
@@ -498,9 +434,8 @@ class CreateTaskScreen(
                                         }
                                     }
                                 } else {
-                                    // Disabling meeting toggle
                                     isMeetingTask = false
-                                    errorMessage = null // Clear any error messages
+                                    errorMessage = null
                                 }
                             }
                         )
@@ -508,8 +443,6 @@ class CreateTaskScreen(
                     }
                 }
 
-
-                // Date and Time Selection - Combined Row
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -524,7 +457,6 @@ class CreateTaskScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Date Field with Calendar Icon
                         OutlinedTextField(
                             value = formatDateDisplay(selectedDate),
                             onValueChange = { },
@@ -553,7 +485,6 @@ class CreateTaskScreen(
                             shape = RoundedCornerShape(12.dp)
                         )
 
-                        // Time Field with Clock Icon
                         OutlinedTextField(
                             value = formatTimeDisplay(selectedHour, selectedMinute, selectedAmPm),
                             onValueChange = { },
@@ -584,7 +515,6 @@ class CreateTaskScreen(
                     }
                 }
 
-                // Task Title
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -617,7 +547,6 @@ class CreateTaskScreen(
                     )
                 }
 
-                // Meeting Link (only show if isMeeting is true)
                 if (isMeetingTask) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -654,7 +583,6 @@ class CreateTaskScreen(
                     }
                 }
 
-                // Task Description
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -708,13 +636,11 @@ class CreateTaskScreen(
 
                         TextButton(
                             onClick = {
-                                // Check if the last item is not empty before adding a new one
                                 val lastItem = taskDetailItems.lastOrNull()
-                                if (lastItem != null && lastItem.isNotBlank()) {
+                                if (!lastItem.isNullOrBlank()) {
                                     taskDetailItems = taskDetailItems + ""
-                                    // Scroll to bottom after adding new item
                                     coroutineScope.launch {
-                                        delay(100) // Small delay to ensure layout is updated
+                                        delay(100)
                                         scrollState.animateScrollTo(scrollState.maxValue)
                                     }
                                 }
@@ -793,7 +719,6 @@ class CreateTaskScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
-            // Delete confirmation dialog (only in edit mode)
             if (isEditMode && existingTask != null) {
                 DeleteConfirmationDialog(
                     showDialog = showDeleteDialog,
@@ -807,7 +732,7 @@ class CreateTaskScreen(
                                 taskTimestampToEdit?.let { timestamp ->
                                     databaseHelper.deleteTask(timestamp)
                                     showDeleteDialog = false
-                                    navigator.pop()  // Return to previous screen
+                                    navigator.pop()
                                 }
                             } catch (e: Exception) {
                                 println("DeleteTask: Error - ${e.message}")
@@ -819,7 +744,6 @@ class CreateTaskScreen(
                 )
             }
 
-            // Date Picker Dialog
             if (showDatePicker) {
                 val dateParts = selectedDate.split("-")
                 val initialYear = dateParts.getOrNull(0)?.toIntOrNull() ?: 2024
@@ -840,7 +764,6 @@ class CreateTaskScreen(
                 )
             }
 
-            // Time Picker Dialog
             if (showTimePicker) {
                 NativeTimePicker(
                     initialHour = selectedHour,

@@ -1,17 +1,9 @@
 package dev.wondertech.notedup.modal
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
 
-/**
- * Represents an individual task item within a task group.
- *
- * @property id Unique identifier for the task item
- * @property text The task description or content
- * @property isCompleted Indicates whether the task has been completed (default: false)
- */
 data class TaskItem(
     val id: String,
     val text: String,
@@ -30,7 +22,7 @@ data class TaskItem(
  * @property completedTasks Number of completed tasks in the taskList
  */
 data class TaskData(
-    val timestampMillis: Long,  // PRIMARY KEY - task date+time in milliseconds
+    val timestampMillis: Long,
     val id: String = timestampMillis.toString(),
     val title: String,
     val subtitle: String,
@@ -40,41 +32,13 @@ data class TaskData(
     val isMeeting: Boolean = false,
     val meetingLink: String = ""
 ) {
-    /**
-     * Computed deadline string formatted for display.
-     * Converts timestampMillis to a human-readable date and time format.
-     *
-     * @return Formatted string in the format "YYYY-MM-DD HH:MM"
-     */
+
     @OptIn(ExperimentalTime::class)
     val deadline: String
         get() {
-            val instant = Instant.fromEpochMilliseconds(timestampMillis)
+            val instant = kotlin.time.Instant.fromEpochMilliseconds(timestampMillis)
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+
             return "${dateTime.date} ${dateTime.time.hour}:${dateTime.time.minute.toString().padStart(2, '0')}"
         }
-
-    /**
-     * Calculates the completion progress as a fraction between 0 and 1.
-     *
-     * @return Progress value (0.0 to 1.0), or 0 if taskList is empty
-     */
-    val progress: Float
-        get() = if (taskList.isEmpty()) 0f else completedTasks.toFloat() / taskList.size
-
-    /**
-     * Calculates the completion progress as a percentage.
-     *
-     * @return Progress as an integer percentage (0 to 100)
-     */
-    val progressPercentage: Int
-        get() = (progress * 100).toInt()
-
-    /**
-     * Generates a formatted progress text displaying percentage and task counts.
-     *
-     * @return Formatted string like "75% (3/4 tasks)"
-     */
-    val progressText: String
-        get() = "$progressPercentage% ($completedTasks/${taskList.size} tasks)"
 }

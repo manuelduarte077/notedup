@@ -9,4 +9,4 @@ import org.jetbrains.compose.resources.DrawableResource
  * @property icon The drawable resource for the preference icon
  * @property title The title or label for the preference item (default: empty string)
  */
-data class PrefsModel(val icon: DrawableResource, val title:String = "")
+data class PrefsModel(val icon: DrawableResource, val title: String = "")

@@ -1,15 +1,3 @@
-/**
- * Task preview/details screen for viewing task information.
- *
- * This screen displays task details in a read-only format, allowing users to
- * view complete task information without accidentally editing. Users can mark
- * task items as complete directly from this screen. Edit and Delete actions
- * are available via top bar buttons.
- *
- * @author Muhammad Ali
- * @date 2026-01-05
- * @see <a href="https://muhammadali0092.netlify.app/">Portfolio</a>
- */
 package dev.wondertech.notedup.screens
 
 import androidx.compose.foundation.Image
@@ -106,7 +94,7 @@ class PreviewTaskScreen(
             }
         }
 
-        Scaffold { innerPadding ->
+        Scaffold { _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,7 +103,6 @@ class PreviewTaskScreen(
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Top App Bar with Edit and Delete buttons
                 NotedUpTopAppBar(
                     title = "Task Details",
                     canShowNavigationIcon = true,
@@ -125,18 +112,14 @@ class PreviewTaskScreen(
                         navigator.pop()
                     },
                     onOtherIconClick = {
-                        // Navigate to CreateTaskScreen in edit mode
                         navigator.push(CreateTaskScreen(taskTimestampToEdit = taskTimestampToEdit))
                     },
                     onTrailingIconClick = {
-                        // Show delete confirmation dialog
                         showDeleteDialog = true
                     }
                 )
 
-                // Display task information if loaded
                 taskData?.let { task ->
-                    // Status Section
                     TaskarooStatusBadge(
                         modifier = Modifier.fillMaxWidth(),
                         status = task.isDone.toTaskStatus(),
@@ -147,12 +130,9 @@ class PreviewTaskScreen(
                                 try {
                                     databaseHelper.updateTaskDoneStatus(task.timestampMillis, isDone)
 
-                                    // Cancel notification if task marked done and is a meeting
                                     if (isDone && task.isMeeting) {
                                         notificationScheduler.cancelNotification(task.timestampMillis)
                                     }
-
-                                    // Update local state
                                     taskData = task.copy(isDone = isDone)
                                 } catch (e: Exception) {
                                     println("Error updating task status: ${e.message}")
@@ -162,7 +142,6 @@ class PreviewTaskScreen(
                         fullWidth = true
                     )
 
-                    // Deadline Section
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -174,7 +153,6 @@ class PreviewTaskScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Date
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -189,10 +167,8 @@ class PreviewTaskScreen(
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-
                         }
 
-                        // Time
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -210,7 +186,6 @@ class PreviewTaskScreen(
                         }
                     }
 
-                    // Meeting Link (if task is meeting and has link)
                     if (task.isMeeting && task.meetingLink.isNotEmpty()) {
                         val uriHandler = LocalUriHandler.current
                         Row(
@@ -252,7 +227,6 @@ class PreviewTaskScreen(
                         }
                     }
 
-                    // Task Title
                     Text(
                         text = task.title,
                         fontSize = 24.sp,
@@ -261,7 +235,6 @@ class PreviewTaskScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    // Task Description/Subtitle
                     if (task.subtitle.isNotBlank()) {
                         Text(
                             text = task.subtitle,
@@ -272,7 +245,6 @@ class PreviewTaskScreen(
                         )
                     }
 
-                    // Task Items Checklist
                     if (task.taskList.isNotEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxWidth(),

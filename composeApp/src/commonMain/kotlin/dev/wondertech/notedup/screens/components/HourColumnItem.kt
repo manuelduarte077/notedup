@@ -32,9 +32,7 @@ fun HourColumnItem(
     onTaskLongClick: (TaskData) -> Unit = {}
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp)
+        modifier = modifier.fillMaxWidth().padding(top = 12.dp)
     ) {
         Row(verticalAlignment = Alignment.Top) {
             Text(
@@ -47,10 +45,7 @@ fun HourColumnItem(
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.fillMaxSize().weight(1f)) {
                 Spacer(
-                    modifier = Modifier
-                        .padding(top = 14.dp)
-                        .height(1.dp)
-                        .fillMaxWidth(1f)
+                    modifier = Modifier.padding(top = 14.dp).height(1.dp).fillMaxWidth(1f)
                         .background(primaryLiteColorVariant)
                 )
                 items.forEach { taskData ->
@@ -59,11 +54,9 @@ fun HourColumnItem(
                         taskData = taskData,
                         onTaskItemToggle = onTaskItemToggle,
                         onClick = { onTaskClick(taskData) },
-                        onLongClick = { onTaskLongClick(taskData) }
-                    )
+                        onLongClick = { onTaskLongClick(taskData) })
                 }
             }
-
         }
     }
 }
