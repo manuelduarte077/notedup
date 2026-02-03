@@ -88,7 +88,7 @@ private val lightColorScheme = lightColorScheme(
 
 
 @Composable
-fun TaskarooAppTheme(
+fun NotedUpAppTheme(
     themeMode: ThemeMode = ThemeMode.LIGHT,
     content: @Composable () -> Unit
 ) {

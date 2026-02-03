@@ -27,12 +27,9 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-
-            // SQLDelight Android Driver
             implementation(libs.sqldelight.android)
         }
         iosMain.dependencies {
-            // SQLDelight Native Driver
             implementation(libs.sqldelight.native)
         }
         commonMain.dependencies {

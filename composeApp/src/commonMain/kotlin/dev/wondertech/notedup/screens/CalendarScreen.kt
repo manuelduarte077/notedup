@@ -20,8 +20,8 @@ import dev.wondertech.notedup.database.LocalDatabase
 import dev.wondertech.notedup.modal.TaskData
 import dev.wondertech.notedup.screens.components.HourColumnItem
 import dev.wondertech.notedup.utils.DateTimeUtils
-import dev.wondertech.notedup.utils.todayDate
 import dev.wondertech.notedup.utils.Utils.hoursList
+import dev.wondertech.notedup.utils.todayDate
 import kotlinx.coroutines.launch
 import notedup.composeapp.generated.resources.Res
 import notedup.composeapp.generated.resources.add_icon
@@ -36,35 +36,29 @@ class CalendarScreen : Screen {
         val databaseHelper = LocalDatabase.current
         val coroutineScope = rememberCoroutineScope()
 
-        // Selected date state
         var selectedDate by remember {
             mutableStateOf(todayDate())
         }
 
-        // Tasks for selected date
         var tasksForSelectedDate by remember { mutableStateOf<List<TaskData>>(emptyList()) }
-
-        // Delete dialog state
         var showDeleteDialog by remember { mutableStateOf(false) }
         var taskToDelete by remember { mutableStateOf<TaskData?>(null) }
 
-        // Load tasks when date changes
         LaunchedEffect(selectedDate) {
             val startMillis = DateTimeUtils.getStartOfDayMillis(selectedDate)
             val endMillis = DateTimeUtils.getEndOfDayMillis(selectedDate)
             tasksForSelectedDate = databaseHelper.getTasksForDate(startMillis, endMillis)
         }
 
-        // Group tasks by hour slot
         fun groupTasksByHour(tasks: List<TaskData>): Map<Int, List<TaskData>> {
             return tasks
                 .groupBy { DateTimeUtils.getHourSlotIndex(it.timestampMillis) }
                 .mapValues { (_, tasksInHour) ->
-                    tasksInHour.sortedBy { it.timestampMillis }  // Ascending order
+                    tasksInHour.sortedBy { it.timestampMillis }
                 }
         }
 
-        Scaffold { innerPaddings ->
+        Scaffold { _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -83,10 +77,8 @@ class CalendarScreen : Screen {
 
                 HorizontalCalendar { newSelectedDate ->
                     selectedDate = newSelectedDate
-                    println("Selected date: $selectedDate")
                 }
 
-                // Group tasks by hour
                 val tasksByHour = remember(tasksForSelectedDate) {
                     groupTasksByHour(tasksForSelectedDate)
                 }
@@ -123,7 +115,6 @@ class CalendarScreen : Screen {
 
             }
 
-            // Delete confirmation dialog
             if (showDeleteDialog && taskToDelete != null) {
                 DeleteConfirmationDialog(
                     showDialog = showDeleteDialog,
@@ -144,8 +135,7 @@ class CalendarScreen : Screen {
                                     showDeleteDialog = false
                                     taskToDelete = null
                                 }
-                            } catch (e: Exception) {
-                                println("CalendarScreen: Error deleting task - ${e.message}")
+                            } catch (_: Exception) {
                                 showDeleteDialog = false
                                 taskToDelete = null
                             }

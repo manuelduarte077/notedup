@@ -1,37 +1,14 @@
-/**
- * Note creation and editing screen with auto-save functionality.
- *
- * This screen provides a minimal interface for creating and editing notes.
- * Features include large text inputs for title and content, automatic cursor
- * focus on the content field, and auto-save on back navigation.
- *
- * @author Muhammad Ali
- * @date 2026-01-28
- * @see <a href="https://muhammadali0092.netlify.app/">Portfolio</a>
- */
 package dev.wondertech.notedup.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -83,19 +60,17 @@ class CreateNoteScreen(
             }
         }
 
-        // Request focus on content field after a short delay
         LaunchedEffect(Unit) {
             kotlinx.coroutines.delay(300)
             focusRequester.requestFocus()
         }
 
-        // Auto-save function
         fun saveNote() {
             if (noteTitle.isNotBlank() || noteContent.isNotBlank()) {
                 coroutineScope.launch {
                     try {
                         val timestampMillis = if (isEditMode) {
-                            noteTimestampToEdit!!
+                            noteTimestampToEdit
                         } else {
                             currentTimeMillis()
                         }
@@ -118,7 +93,7 @@ class CreateNoteScreen(
             }
         }
 
-        Scaffold { innerPadding ->
+        Scaffold { _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -143,7 +118,6 @@ class CreateNoteScreen(
 
                 Spacer(Modifier.height(8.dp))
 
-                // Title input
                 BasicTextField(
                     value = noteTitle,
                     onValueChange = { noteTitle = it },
@@ -167,7 +141,6 @@ class CreateNoteScreen(
                     }
                 )
 
-                // Content input
                 BasicTextField(
                     value = noteContent,
                     onValueChange = { noteContent = it },

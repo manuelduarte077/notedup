@@ -1,14 +1,7 @@
 package dev.wondertech.notedup.screens.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,9 +25,7 @@ fun HourColumnItem(
     onTaskLongClick: (TaskData) -> Unit = {}
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp)
+        modifier = modifier.fillMaxWidth().padding(top = 12.dp)
     ) {
         Row(verticalAlignment = Alignment.Top) {
             Text(
@@ -47,10 +38,7 @@ fun HourColumnItem(
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.fillMaxSize().weight(1f)) {
                 Spacer(
-                    modifier = Modifier
-                        .padding(top = 14.dp)
-                        .height(1.dp)
-                        .fillMaxWidth(1f)
+                    modifier = Modifier.padding(top = 14.dp).height(1.dp).fillMaxWidth(1f)
                         .background(primaryLiteColorVariant)
                 )
                 items.forEach { taskData ->
@@ -59,11 +47,9 @@ fun HourColumnItem(
                         taskData = taskData,
                         onTaskItemToggle = onTaskItemToggle,
                         onClick = { onTaskClick(taskData) },
-                        onLongClick = { onTaskLongClick(taskData) }
-                    )
+                        onLongClick = { onTaskLongClick(taskData) })
                 }
             }
-
         }
     }
 }

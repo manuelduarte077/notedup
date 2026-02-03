@@ -1,51 +1,15 @@
 package dev.wondertech.notedup.common
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -60,23 +24,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.wondertech.notedup.completedStatusBackground
-import dev.wondertech.notedup.completedStatusColor
+import dev.wondertech.notedup.*
 import dev.wondertech.notedup.modal.TaskData
 import dev.wondertech.notedup.modal.TaskItem
-import dev.wondertech.notedup.overdueStatusBackground
-import dev.wondertech.notedup.overdueStatusColor
-import dev.wondertech.notedup.primaryColorVariant
-import dev.wondertech.notedup.primaryLiteColorVariant
-import dev.wondertech.notedup.undoneStatusBackground
-import dev.wondertech.notedup.undoneStatusColor
 import dev.wondertech.notedup.utils.DateTimeUtils.isTaskOverdue
-import notedup.composeapp.generated.resources.Res
-import notedup.composeapp.generated.resources.all_icon
-import notedup.composeapp.generated.resources.back_button
-import notedup.composeapp.generated.resources.completed_icon
-import notedup.composeapp.generated.resources.inprogress_icon
-import notedup.composeapp.generated.resources.overdue_icon
+import notedup.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -112,112 +64,77 @@ fun NotedUpTopAppBar(
             modifier = Modifier.weight(1f),
             text = title,
             fontSize = 22.sp,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
 
         if (otherIcon != null) {
-            TaskarooRoundedIcon(
-                icon = otherIcon,
-                getAddButtonClick = {
+            NotedUpRoundedIcon(
+                icon = otherIcon, getAddButtonClick = {
                     onOtherIconClick()
-                }
-            )
+                })
         }
 
         if (trailingIcon != null) {
-            TaskarooRoundedIcon(
-                icon = trailingIcon,
-                getAddButtonClick = {
+            NotedUpRoundedIcon(
+                icon = trailingIcon, getAddButtonClick = {
                     onTrailingIconClick()
-                }
-            )
+                })
         }
     }
-
 }
 
-/**
- * Alert dialog for confirming item deletion
- *
- * @param showDialog Whether the dialog should be displayed
- * @param taskTitle The title of the item to be deleted
- * @param itemType The type of item being deleted (default: "Task")
- * @param onDismiss Callback invoked when dialog is dismissed or cancelled
- * @param onConfirm Callback invoked when user confirms deletion
- */
 @Composable
 fun DeleteConfirmationDialog(
-    showDialog: Boolean,
-    taskTitle: String,
-    itemType: String = "Task",
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    showDialog: Boolean, taskTitle: String, itemType: String = "Task", onDismiss: () -> Unit, onConfirm: () -> Unit
 ) {
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = onDismiss,
-            title = {
+            onDismissRequest = onDismiss, title = {
                 Text(
                     text = "Delete $itemType",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-            },
-            text = {
+            }, text = {
                 Text(
                     text = "Are you sure you want to delete \"$taskTitle\" permanently?",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                 )
-            },
-            confirmButton = {
+            }, confirmButton = {
                 TextButton(
                     onClick = onConfirm
                 ) {
                     Text(
-                        text = "Delete",
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold
+                        text = "Delete", color = Color.Red, fontWeight = FontWeight.Bold
                     )
                 }
-            },
-            dismissButton = {
+            }, dismissButton = {
                 TextButton(
                     onClick = onDismiss
                 ) {
                     Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
                 }
-            },
-            containerColor = MaterialTheme.colorScheme.background,
-            shape = RoundedCornerShape(16.dp)
+            }, containerColor = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(16.dp)
         )
     }
 }
 
-/**
- * Circular icon button with transparent background and border
- *
- * @param icon The drawable resource for the icon
- * @param getAddButtonClick Callback invoked when the icon is clicked
- */
 @Composable
-fun TaskarooRoundedIcon(icon: DrawableResource, getAddButtonClick: () -> Unit) {
+fun NotedUpRoundedIcon(icon: DrawableResource, getAddButtonClick: () -> Unit) {
     Surface(
-        modifier = Modifier
-            .clip(CircleShape)
-            .clickable {
-                getAddButtonClick()
-            },
+        modifier = Modifier.clip(CircleShape).clickable {
+            getAddButtonClick()
+        },
         color = Color.Transparent,
         shape = CircleShape,
         border = BorderStroke(1.dp, color = primaryLiteColorVariant)
     ) {
         Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
             Icon(
-                modifier = Modifier
-                    .size(20.dp),
+                modifier = Modifier.size(20.dp),
                 painter = painterResource(icon),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground
@@ -226,79 +143,6 @@ fun TaskarooRoundedIcon(icon: DrawableResource, getAddButtonClick: () -> Unit) {
     }
 }
 
-/**
- * Horizontal row of selectable category chips with pill-shaped design
- * Scrollable horizontally when content exceeds available width
- *
- * @param categories List of category names to display
- * @param onCategorySelected Callback invoked when a category is selected
- */
-@Composable
-fun TaskChipRow(
-    categories: List<String>,
-    onCategorySelected: (String) -> Unit = {}
-) {
-    var selectedCategory by remember { mutableStateOf(categories.first()) }
-    val scrollState = rememberScrollState()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(scrollState)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = CircleShape
-            ),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        categories.forEach { category ->
-            val isSelected = category == selectedCategory
-
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent,
-                        shape = CircleShape
-                    )
-                    .clip(CircleShape)
-                    .clickable {
-                        selectedCategory = category
-                        onCategorySelected(category)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = category,
-                        color = if (isSelected) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
-                        },
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-/**
- * Compact task card displaying task title, items, and deadline
- *
- * @param modifier Modifier to apply to the card
- * @param taskData The task data to display
- * @param onTaskItemToggle Callback invoked when a task item checkbox is toggled
- * @param onClick Callback invoked when the card is clicked
- * @param onLongClick Callback invoked when the card is long-pressed
- */
 @Composable
 fun TaskCardConcise(
     modifier: Modifier,
@@ -308,23 +152,16 @@ fun TaskCardConcise(
     onLongClick: () -> Unit = {}
 ) {
     Card(
-        modifier = modifier
-            .alpha(if (taskData.isDone) 0.85f else 1f)
-            .combinedClickable(
-                onClick = { onClick() },
-                onLongClick = { onLongClick() }
-            ),
+        modifier = modifier.alpha(if (taskData.isDone) 0.85f else 1f)
+            .combinedClickable(onClick = { onClick() }, onLongClick = { onLongClick() }),
         border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onBackground),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Title and Subtitle
             Text(
                 modifier = Modifier.wrapContentWidth(),
                 text = taskData.title,
@@ -336,21 +173,17 @@ fun TaskCardConcise(
                 textDecoration = if (taskData.isDone) TextDecoration.LineThrough else TextDecoration.None
             )
 
-            // Show meeting link if exists, otherwise show description
             if (taskData.isMeeting && taskData.meetingLink.isNotEmpty()) {
                 val uriHandler = LocalUriHandler.current
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
-                        .clickable {
-                            try {
-                                uriHandler.openUri(taskData.meetingLink)
-                            } catch (e: Exception) {
-                                // Handle invalid URL gracefully
-                            }
-                        },
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).clickable {
+                        try {
+                            uriHandler.openUri(taskData.meetingLink)
+                        } catch (e: Exception) {
+                            // Handle invalid URL gracefully
+                        }
+                    },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
@@ -371,7 +204,6 @@ fun TaskCardConcise(
                     )
                 }
             } else if (taskData.subtitle.isNotEmpty()) {
-                // Subtitle
                 Text(
                     modifier = Modifier.wrapContentWidth(),
                     text = taskData.subtitle,
@@ -384,21 +216,15 @@ fun TaskCardConcise(
                 )
             }
 
-            // Task Details Section
             if (taskData.taskList.isNotEmpty()) {
-                // Task Items
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     taskData.taskList.take(2).forEach { taskItem ->
                         TaskItemRow(
-                            taskItem = taskItem,
-                            maxLines = 2,
-                            isConciseItem = true,
-                            onToggle = { isChecked ->
+                            taskItem = taskItem, maxLines = 2, isConciseItem = true, onToggle = { isChecked ->
                                 onTaskItemToggle(taskItem.id, isChecked)
-                            }
-                        )
+                            })
                     }
                 }
             }
@@ -417,14 +243,6 @@ fun TaskCardConcise(
 }
 
 
-/**
- * Full-featured task card with title, subtitle, priority, deadline, and progress tracking
- *
- * @param taskData The task data to display
- * @param onTaskItemToggle Callback invoked when a task item checkbox is toggled
- * @param onClick Callback invoked when the card is clicked
- * @param onLongClick Callback invoked when the card is long-pressed
- */
 @Composable
 fun TaskCard(
     taskData: TaskData,
@@ -437,15 +255,9 @@ fun TaskCard(
     val uriHandler = LocalUriHandler.current
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-            .clip(RoundedCornerShape(16.dp))
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clip(RoundedCornerShape(16.dp))
             .alpha(if (taskData.isDone) 0.85f else 1f)
-            .combinedClickable(
-                onClick = { onClick() },
-                onLongClick = { onLongClick() }
-            ),
+            .combinedClickable(onClick = { onClick() }, onLongClick = { onLongClick() }),
         border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onBackground),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -454,11 +266,8 @@ fun TaskCard(
             modifier = Modifier.fillMaxWidth()
                 .then(if (taskData.taskList.isNotEmpty()) Modifier.padding(top = 16.dp) else Modifier.padding(vertical = 16.dp))
         ) {
-            // Title, Subtitle and Done Checkbox
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
@@ -476,7 +285,7 @@ fun TaskCard(
 
                 Spacer(Modifier.height(16.dp))
 
-                TaskarooStatusBadge(
+                NotedUpStatusBadge(
                     status = taskData.isDone.toTaskStatus(),
                     isOverdue = isTaskOverdue(taskData.timestampMillis),
                     onStatusChange = { newStatus ->
@@ -488,20 +297,15 @@ fun TaskCard(
 
             Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp)) {
 
-                // Show meeting link if exists, otherwise show description
                 if (taskData.isMeeting && taskData.meetingLink.isNotEmpty()) {
-                    // Show clickable meeting link
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                try {
-                                    uriHandler.openUri(taskData.meetingLink)
-                                } catch (e: Exception) {
-                                    // Handle invalid URL gracefully
-                                }
-                            },
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable {
+                            try {
+                                uriHandler.openUri(taskData.meetingLink)
+                            } catch (e: Exception) {
+                                // Handle invalid URL gracefully
+                            }
+                        },
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -522,7 +326,6 @@ fun TaskCard(
                         )
                     }
                 } else if (taskData.subtitle.isNotEmpty()) {
-                    // Show description only if no meeting link
                     Text(
                         text = taskData.subtitle,
                         fontSize = 14.sp,
@@ -544,16 +347,11 @@ fun TaskCard(
                 textDecoration = if (taskData.isDone) TextDecoration.LineThrough else TextDecoration.None
             )
 
-            // Task Details Section
             if (taskData.taskList.isNotEmpty()) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(0.15f)
-                        )
-                        .padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp).background(
+                        color = MaterialTheme.colorScheme.primary.copy(0.15f)
+                    ).padding(start = 16.dp, end = 16.dp, top = 12.dp),
                 ) {
                     Text(
                         text = "Sub-tasks list",
@@ -562,19 +360,15 @@ fun TaskCard(
                         color = MaterialTheme.colorScheme.onBackground
                     )
 
-                    // Task Items
                     Column(
                         modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         taskData.taskList.take(2).forEach { taskItem ->
                             TaskItemRow(
-                                taskItem = taskItem,
-                                maxLines = 2,
-                                onToggle = { isChecked ->
+                                taskItem = taskItem, maxLines = 2, onToggle = { isChecked ->
                                     onTaskItemToggle(taskItem.id, isChecked)
-                                }
-                            )
+                                })
                         }
                     }
                 }
@@ -583,54 +377,34 @@ fun TaskCard(
     }
 }
 
-/**
- * Custom circular checkbox with animated check mark
- * @param checked Whether the checkbox is currently checked
- * @param onCheckedChange Callback invoked when checkbox state changes
- * @param modifier Modifier to apply to the checkbox
- */
+
 @Composable
 fun CircularCheckbox(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    uncheckColor: Color,
-    modifier: Modifier = Modifier
+    checked: Boolean, onCheckedChange: (Boolean) -> Unit, uncheckColor: Color, modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
-            .size(24.dp)
-            .drawBehind {
-                val strokeWidth = Stroke(width = 1.dp.toPx())
-                val radius = size.minDimension / 2
+        modifier = modifier.size(24.dp).drawBehind {
+            val strokeWidth = Stroke(width = 1.dp.toPx())
+            val radius = size.minDimension / 2
 
-                // Draw circle border
+            drawCircle(
+                color = uncheckColor.copy(alpha = if (checked) 0.5f else 0.8f),
+                radius = radius,
+                style = if (checked) Stroke(width = strokeWidth.width) else strokeWidth
+            )
+
+            if (checked) {
                 drawCircle(
-                    color = uncheckColor.copy(alpha = if (checked) 0.5f else 0.8f),
-                    radius = radius,
-                    style = if (checked) Stroke(width = strokeWidth.width) else strokeWidth
+                    color = primaryColorVariant, radius = radius - strokeWidth.width / 2
                 )
-
-                // Draw filled circle if checked
-                if (checked) {
-                    drawCircle(
-                        color = primaryColorVariant,
-                        radius = radius - strokeWidth.width / 2
-                    )
-                }
             }
-            .clip(CircleShape)
-            .clickable { onCheckedChange(!checked) },
-        contentAlignment = Alignment.Center
+        }.clip(CircleShape).clickable { onCheckedChange(!checked) }, contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
-            visible = checked,
-            enter = fadeIn(animationSpec = tween(150)) + expandVertically(
-                animationSpec = tween(150),
-                expandFrom = Alignment.CenterVertically
-            ),
-            exit = fadeOut(animationSpec = tween(150)) + shrinkVertically(
-                animationSpec = tween(150),
-                shrinkTowards = Alignment.CenterVertically
+            visible = checked, enter = fadeIn(animationSpec = tween(150)) + expandVertically(
+                animationSpec = tween(150), expandFrom = Alignment.CenterVertically
+            ), exit = fadeOut(animationSpec = tween(150)) + shrinkVertically(
+                animationSpec = tween(150), shrinkTowards = Alignment.CenterVertically
             )
         ) {
             Icon(
@@ -643,51 +417,19 @@ fun CircularCheckbox(
     }
 }
 
-/**
- * Task Status enum representing the completion status of a task
- *
- * @property displayName The user-facing display name for the status
- * @property isCompleted Whether this status represents a completed task
- */
+
 enum class TaskStatus(val displayName: String, val isCompleted: Boolean) {
-    /** Task is not yet completed */
     UNDONE("Undone", false),
-
-    /** Task has been completed */
     COMPLETED("Done", true),
-
-    /** Task is undone and past its deadline */
     OVERDUE("Overdue", false)
 }
 
-/**
- * Extension function to convert Boolean to TaskStatus
- */
 fun Boolean.toTaskStatus() = if (this) TaskStatus.COMPLETED else TaskStatus.UNDONE
 
-/**
- * Extension function to convert TaskStatus to Boolean
- */
 fun TaskStatus.toBoolean() = this.isCompleted
 
-/**
- * Task status badge with color-coded visual feedback and dropdown menu for status changes.
- * Displays task completion status with automatic overdue detection.
- *
- * Visual Design:
- * - Rounded corners (8dp)
- * - Colored background and text based on status
- * - Icon indicator (check circle for completed, radio button for undone)
- * - Optional dropdown arrow for full-width variant
- *
- * @param status Current task status (UNDONE, COMPLETED, or OVERDUE)
- * @param isOverdue Whether the task deadline has passed
- * @param onStatusChange Callback invoked when user changes the status
- * @param modifier Modifier to apply to the badge container
- * @param fullWidth If true, badge expands to full width and shows dropdown arrow
- */
 @Composable
-fun TaskarooStatusBadge(
+fun NotedUpStatusBadge(
     status: TaskStatus,
     isOverdue: Boolean,
     onStatusChange: (TaskStatus) -> Unit,
@@ -696,7 +438,6 @@ fun TaskarooStatusBadge(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    // Determine display status and colors
     val displayStatus = if (!status.isCompleted && isOverdue) {
         TaskStatus.OVERDUE
     } else {
@@ -710,7 +451,6 @@ fun TaskarooStatusBadge(
     }
 
     Box(modifier = modifier) {
-        // Status Badge
         Box(
             modifier = Modifier
                 .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
@@ -721,13 +461,10 @@ fun TaskarooStatusBadge(
                 .clip(RoundedCornerShape(8.dp))
                 .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(8.dp))
                 .clickable { showDialog = true }
-                .padding(horizontal = if (fullWidth) 16.dp else 8.dp, vertical = if (fullWidth) 12.dp else 4.dp)
-        ) {
+                .padding(horizontal = if (fullWidth) 16.dp else 8.dp, vertical = if (fullWidth) 12.dp else 4.dp)) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Status indicator icon
                 Icon(
                     imageVector = if (status.isCompleted) {
                         Icons.Default.CheckCircle
@@ -739,7 +476,6 @@ fun TaskarooStatusBadge(
                     modifier = Modifier.size(if (fullWidth) 24.dp else 16.dp)
                 )
 
-                // Status text
                 Text(
                     text = displayStatus.displayName,
                     fontSize = if (fullWidth) 16.sp else 12.sp,
@@ -759,7 +495,6 @@ fun TaskarooStatusBadge(
             }
         }
 
-        // Status Selection Dialog
         TaskStatusDialog(
             showDialog = showDialog,
             currentStatus = status,
@@ -771,41 +506,24 @@ fun TaskarooStatusBadge(
     }
 }
 
-/**
- * Dialog for selecting task completion status.
- * Provides a visual selection interface matching the app's theme.
- * Shows all three status options: Undone, Done, and Overdue.
- * User selects a status and confirms with OK button.
- *
- * @param showDialog Whether to display the dialog
- * @param currentStatus Current task status
- * @param onStatusSelected Callback when OK is pressed with selected status
- * @param onDismiss Callback when dialog is dismissed or cancelled
- */
 @Composable
 fun TaskStatusDialog(
-    showDialog: Boolean,
-    currentStatus: TaskStatus,
-    onStatusSelected: (TaskStatus) -> Unit,
-    onDismiss: () -> Unit
+    showDialog: Boolean, currentStatus: TaskStatus, onStatusSelected: (TaskStatus) -> Unit, onDismiss: () -> Unit
 ) {
     if (showDialog) {
         var selectedStatus by remember { mutableStateOf(currentStatus) }
 
         AlertDialog(
-            onDismissRequest = onDismiss,
-            title = {
+            onDismissRequest = onDismiss, title = {
                 Text(
                     text = "Change Status",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-            },
-            text = {
+            }, text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
                         text = "Select task status:",
@@ -813,69 +531,48 @@ fun TaskStatusDialog(
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                     )
 
-                    // Undone Status Option
                     StatusOptionCard(
                         icon = Icons.Default.RadioButtonUnchecked,
                         statusText = "Undone",
                         statusColor = undoneStatusColor,
                         statusBackground = undoneStatusBackground,
                         isSelected = selectedStatus == TaskStatus.UNDONE,
-                        onClick = { selectedStatus = TaskStatus.UNDONE }
-                    )
+                        onClick = { selectedStatus = TaskStatus.UNDONE })
 
-                    // Done Status Option
                     StatusOptionCard(
                         icon = Icons.Default.CheckCircle,
                         statusText = "Done",
                         statusColor = completedStatusColor,
                         statusBackground = completedStatusBackground,
                         isSelected = selectedStatus == TaskStatus.COMPLETED,
-                        onClick = { selectedStatus = TaskStatus.COMPLETED }
-                    )
+                        onClick = { selectedStatus = TaskStatus.COMPLETED })
 
-                    // Overdue Status Option
                     StatusOptionCard(
                         icon = Icons.Default.RadioButtonUnchecked,
                         statusText = "Overdue",
                         statusColor = overdueStatusColor,
                         statusBackground = overdueStatusBackground,
                         isSelected = selectedStatus == TaskStatus.OVERDUE,
-                        onClick = { selectedStatus = TaskStatus.OVERDUE }
-                    )
+                        onClick = { selectedStatus = TaskStatus.OVERDUE })
                 }
-            },
-            confirmButton = {
+            }, confirmButton = {
                 TextButton(
                     onClick = {
                         onStatusSelected(selectedStatus)
                         onDismiss()
-                    }
-                ) {
+                    }) {
                     Text("OK", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 }
-            },
-            dismissButton = {
+            }, dismissButton = {
                 TextButton(onClick = onDismiss) {
                     Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
                 }
-            },
-            containerColor = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(16.dp)
+            }, containerColor = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(16.dp)
         )
     }
 }
 
-/**
- * Individual status option card for TaskStatusDialog.
- * Shows a check mark when selected for visual feedback.
- *
- * @param icon The icon to display for this status
- * @param statusText The text label for this status
- * @param statusColor The color for text and icons
- * @param statusBackground The background color for the card
- * @param isSelected Whether this option is currently selected
- * @param onClick Callback when the card is clicked
- */
+
 @Composable
 private fun StatusOptionCard(
     icon: ImageVector,
@@ -895,22 +592,16 @@ private fun StatusOptionCard(
             containerColor = if (isSelected) statusBackground else MaterialTheme.colorScheme.background
         ),
         border = BorderStroke(
-            width = 1.dp,
-            color = statusColor
+            width = 1.dp, color = statusColor
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = statusColor,
-                modifier = Modifier.size(24.dp)
+                imageVector = icon, contentDescription = null, tint = statusColor, modifier = Modifier.size(24.dp)
             )
             Text(
                 text = statusText,
@@ -920,7 +611,6 @@ private fun StatusOptionCard(
                 modifier = Modifier.weight(1f)
             )
 
-            // Show check mark when selected
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -934,13 +624,6 @@ private fun StatusOptionCard(
 }
 
 
-/**
- * Individual task item row with checkbox and text
- *
- * @param taskItem The task item data to display
- * @param isConciseItem Whether to use smaller sizing for compact layout
- * @param onToggle Callback invoked when the checkbox is toggled
- */
 @Composable
 fun TaskItemRow(
     modifier: Modifier = Modifier,
@@ -952,19 +635,15 @@ fun TaskItemRow(
     var isChecked by remember { mutableStateOf(taskItem.isCompleted) }
 
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CircularCheckbox(
-            checked = isChecked,
-            uncheckColor = MaterialTheme.colorScheme.onBackground,
-            onCheckedChange = { checked ->
+            checked = isChecked, uncheckColor = MaterialTheme.colorScheme.onBackground, onCheckedChange = { checked ->
                 isChecked = checked
                 onToggle(checked)
-            },
-            modifier = Modifier.size(if (isConciseItem) 15.dp else 18.dp)
+            }, modifier = Modifier.size(if (isConciseItem) 15.dp else 18.dp)
         )
 
         Text(
@@ -980,17 +659,7 @@ fun TaskItemRow(
     }
 }
 
-/**
- * Summary cards grid showing task statistics that act as interactive filters
- * Displays total, completed, active, and overdue task counts
- *
- * @param totalTasks Total number of tasks
- * @param completedTasks Number of completed tasks
- * @param activeTasks Number of active/pending tasks
- * @param overdueTasks Number of overdue tasks
- * @param selectedFilter Currently selected filter ("All", "Completed", "Active", "Overdue")
- * @param onFilterSelected Callback when a filter card is selected
- */
+
 @Composable
 fun TaskSummaryCards(
     totalTasks: Int,
@@ -1001,17 +670,16 @@ fun TaskSummaryCards(
     onFilterSelected: (String) -> Unit = {}
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             SummaryCard(
                 title = "All",
                 count = totalTasks,
                 icon = Res.drawable.all_icon,
-                backgroundColor = Color(0xFF609CFC),
+                backgroundColor = Color(0xFF609CFC).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "All",
                 onClick = { onFilterSelected("All") },
                 modifier = Modifier.weight(1f)
@@ -1021,7 +689,7 @@ fun TaskSummaryCards(
                 title = "Completed",
                 count = completedTasks,
                 icon = Res.drawable.completed_icon,
-                backgroundColor = Color(0xFFE8C254),
+                backgroundColor = Color(0xFFE8C254).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "Completed",
                 onClick = { onFilterSelected("Completed") },
                 modifier = Modifier.weight(1f)
@@ -1029,14 +697,13 @@ fun TaskSummaryCards(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             SummaryCard(
                 title = "Active",
                 count = activeTasks,
                 icon = Res.drawable.inprogress_icon,
-                backgroundColor = Color(0xFF41C4AA),
+                backgroundColor = Color(0xFF41C4AA).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "Active",
                 onClick = { onFilterSelected("Active") },
                 modifier = Modifier.weight(1f)
@@ -1046,7 +713,7 @@ fun TaskSummaryCards(
                 title = "Overdue",
                 count = overdueTasks,
                 icon = Res.drawable.overdue_icon,
-                backgroundColor = Color(0xFFDE5151),
+                backgroundColor = Color(0xFFDE5151).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "Overdue",
                 onClick = { onFilterSelected("Overdue") },
                 modifier = Modifier.weight(1f)
@@ -1055,18 +722,6 @@ fun TaskSummaryCards(
     }
 }
 
-/**
- * Individual summary card component that acts as a clickable filter
- * Shows count, title and icon with colored background
- *
- * @param title The card title (e.g., "Active", "Completed")
- * @param count The number to display
- * @param icon The icon resource to show
- * @param backgroundColor Background color for the card
- * @param isSelected Whether this card is currently selected
- * @param onClick Callback when the card is clicked
- * @param modifier Modifier for the card
- */
 @Composable
 private fun SummaryCard(
     title: String,
@@ -1079,28 +734,23 @@ private fun SummaryCard(
 ) {
     Card(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected)
-                backgroundColor.copy(alpha = 0.9f)
-            else
-                backgroundColor
+            containerColor = if (isSelected) backgroundColor.copy(alpha = 0.9f)
+            else backgroundColor
         ),
         border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected)
-                backgroundColor
-            else
-                backgroundColor.copy(alpha = 0.3f)
+            width = if (isSelected) 2.dp else 1.dp, color = if (isSelected) backgroundColor
+            else backgroundColor.copy(alpha = 0.3f)
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(12.dp),
+                .padding(8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -1119,19 +769,16 @@ private fun SummaryCard(
             ) {
                 Text(
                     text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black.copy(alpha = 0.7f),
                 )
                 Text(
                     text = "$count Tasks",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                 )
             }
-
-
         }
     }
 }

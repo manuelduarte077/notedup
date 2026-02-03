@@ -1,8 +1,6 @@
 package dev.wondertech.notedup.utils
 
 object Utils {
-
-    val categoriesList = listOf("Upcoming", "Active", "Completed", "Meeting", "All")
     val hoursList = listOf(
         "12 am",  // Midnight (hour 0)
         "01 am",  // hour 1

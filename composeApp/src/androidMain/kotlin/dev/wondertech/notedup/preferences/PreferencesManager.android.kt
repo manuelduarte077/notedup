@@ -2,6 +2,7 @@ package dev.wondertech.notedup.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -18,7 +19,8 @@ class AndroidPreferencesManager private constructor(
         private var INSTANCE: AndroidPreferencesManager? = null
 
         val instance: AndroidPreferencesManager
-            get() = INSTANCE ?: throw IllegalStateException("AndroidPreferencesManager not initialized. Call initialize() first.")
+            get() = INSTANCE
+                ?: throw IllegalStateException("AndroidPreferencesManager not initialized. Call initialize() first.")
 
         fun initialize(context: Context): AndroidPreferencesManager {
             return INSTANCE ?: synchronized(this) {
@@ -36,17 +38,17 @@ class AndroidPreferencesManager private constructor(
     override val settingsFlow: StateFlow<AppSettings> = _settingsFlow
 
     override suspend fun updateThemeMode(themeMode: ThemeMode) {
-        sharedPreferences.edit()
-            .putString("theme_mode", themeMode.name)
-            .apply()
+        sharedPreferences.edit {
+            putString("theme_mode", themeMode.name)
+        }
 
         _settingsFlow.value = _settingsFlow.value.copy(themeMode = themeMode)
     }
 
     override suspend fun updateNotificationsEnabled(enabled: Boolean) {
-        sharedPreferences.edit()
-            .putBoolean("notifications_enabled", enabled)
-            .apply()
+        sharedPreferences.edit {
+            putBoolean("notifications_enabled", enabled)
+        }
 
         _settingsFlow.value = _settingsFlow.value.copy(notificationsEnabled = enabled)
     }
@@ -63,7 +65,7 @@ class AndroidPreferencesManager private constructor(
         val themeModeString = sharedPreferences.getString("theme_mode", ThemeMode.LIGHT.name)
         val themeMode = try {
             ThemeMode.valueOf(themeModeString ?: ThemeMode.LIGHT.name)
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             ThemeMode.LIGHT
         }
 

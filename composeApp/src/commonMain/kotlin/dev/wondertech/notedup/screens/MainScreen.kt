@@ -1,28 +1,14 @@
 package dev.wondertech.notedup.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,20 +19,17 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.wondertech.notedup.common.DeleteConfirmationDialog
+import dev.wondertech.notedup.common.NotedUpTopAppBar
 import dev.wondertech.notedup.common.TaskCard
 import dev.wondertech.notedup.common.TaskSummaryCards
-import dev.wondertech.notedup.common.NotedUpTopAppBar
 import dev.wondertech.notedup.database.LocalDatabase
 import dev.wondertech.notedup.modal.TaskData
 import dev.wondertech.notedup.notifications.rememberNotificationPermissionRequester
 import dev.wondertech.notedup.notifications.rememberNotificationScheduler
-import dev.wondertech.notedup.preferences.AppSettings
-import dev.wondertech.notedup.preferences.getPreferencesManager
 import dev.wondertech.notedup.utils.DateTimeUtils.isTaskOverdue
 import dev.wondertech.notedup.utils.currentTimeMillis
 import kotlinx.coroutines.launch
 import notedup.composeapp.generated.resources.Res
-import notedup.composeapp.generated.resources.edit_icon
 import notedup.composeapp.generated.resources.no_task
 import notedup.composeapp.generated.resources.settings_icon
 import org.jetbrains.compose.resources.painterResource
@@ -60,12 +43,8 @@ class MainScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val databaseHelper = LocalDatabase.current
         val coroutineScope = rememberCoroutineScope()
-
-        val preferencesManager = remember { getPreferencesManager() }
-        val settings by preferencesManager.settingsFlow.collectAsState(AppSettings())
         val notificationScheduler = rememberNotificationScheduler()
 
-        // Permission requester for notifications
         val requestNotificationPermission = rememberNotificationPermissionRequester { isGranted ->
             if (isGranted) {
                 println("MainScreen: Notification permission granted")
@@ -74,7 +53,6 @@ class MainScreen : Screen {
             }
         }
 
-        // Request notification permission on first launch
         LaunchedEffect(Unit) {
             val hasPermission = notificationScheduler.checkPermissionStatus()
             if (!hasPermission) {
@@ -84,17 +62,14 @@ class MainScreen : Screen {
             }
         }
 
-        // Track all tasks and filter state
         var allTasks by remember { mutableStateOf<List<TaskData>>(emptyList()) }
         var selectedFilter by remember { mutableStateOf("Active") }
         var filteredTasks by remember { mutableStateOf<List<TaskData>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
 
-        // Delete dialog state
         var showDeleteDialog by remember { mutableStateOf(false) }
         var taskToDelete by remember { mutableStateOf<TaskData?>(null) }
 
-        // Load all tasks initially and when screen appears
         LaunchedEffect(Unit) {
             try {
                 isLoading = true
@@ -107,7 +82,6 @@ class MainScreen : Screen {
             }
         }
 
-        // Filter tasks based on selected filter
         LaunchedEffect(selectedFilter, allTasks) {
             val currentTime = currentTimeMillis()
 
@@ -126,8 +100,7 @@ class MainScreen : Screen {
             }
         }
 
-
-        Scaffold { innerPaddings ->
+        Scaffold { _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -136,9 +109,8 @@ class MainScreen : Screen {
             ) {
 
                 NotedUpTopAppBar(
-                    title = "From to-do to done✨",
+                    title = "NotedUp",
                     canShowNavigationIcon = false,
-                    otherIcon = Res.drawable.edit_icon,
                     trailingIcon = Res.drawable.settings_icon,
                     onOtherIconClick = {
                         navigator.push(NotesScreen())
@@ -150,9 +122,7 @@ class MainScreen : Screen {
 
                 Spacer(Modifier.height(16.dp))
 
-                // Show summary cards only when there are tasks
                 if (allTasks.isNotEmpty()) {
-                    val currentTime = currentTimeMillis()
                     val totalTasks = allTasks.size
                     val completedTasks = allTasks.count { it.isDone }
                     val activeTasks = allTasks.count { !it.isDone }
@@ -172,7 +142,6 @@ class MainScreen : Screen {
                     Spacer(Modifier.height(24.dp))
                 }
 
-                // Dynamic section title - only show when there are filtered tasks
                 if (allTasks.isNotEmpty() && filteredTasks.isNotEmpty()) {
                     Text(
                         text = when (selectedFilter) {
@@ -182,7 +151,7 @@ class MainScreen : Screen {
                             "Overdue" -> "Overdue Tasks"
                             else -> "Recent Tasks"
                         },
-                        fontSize = 17.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -251,7 +220,6 @@ class MainScreen : Screen {
                         }
                     }
                 } else {
-                    // LazyColumn with task cards
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -326,11 +294,8 @@ class MainScreen : Screen {
                         }
                     }
                 }
-
-
             }
 
-            // Delete confirmation dialog
             if (showDeleteDialog && taskToDelete != null) {
                 DeleteConfirmationDialog(
                     showDialog = showDeleteDialog,
@@ -344,10 +309,7 @@ class MainScreen : Screen {
                             try {
                                 taskToDelete?.let { task ->
                                     databaseHelper.deleteTask(task.timestampMillis)
-
-                                    // Update allTasks list
                                     allTasks = allTasks.filter { it.timestampMillis != task.timestampMillis }
-
                                     showDeleteDialog = false
                                     taskToDelete = null
                                 }
@@ -360,8 +322,5 @@ class MainScreen : Screen {
                 )
             }
         }
-
     }
-
-
 }

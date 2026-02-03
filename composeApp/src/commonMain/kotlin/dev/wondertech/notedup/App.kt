@@ -11,7 +11,6 @@ import dev.wondertech.notedup.preferences.ThemeMode
 import dev.wondertech.notedup.preferences.getPreferencesManager
 import dev.wondertech.notedup.screens.RootNavigationScreen
 import dev.wondertech.notedup.utils.SetupSystemBars
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun App() {
@@ -22,7 +21,7 @@ fun App() {
 
     SetupSystemBars(darkTheme = darkTheme)
 
-    TaskarooAppTheme(themeMode = settings.themeMode) {
+    NotedUpAppTheme(themeMode = settings.themeMode) {
         ProvideDatabaseHelper {
             Navigator(screen = RootNavigationScreen())
         }

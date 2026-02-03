@@ -1,35 +1,11 @@
-/**
- * Settings screen for managing app preferences.
- * Allows users to toggle theme mode and notification preferences.
- *
- * @author Claude Code
- * @date 2026-01-17
- */
 package dev.wondertech.notedup.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +35,7 @@ class SettingsScreen : Screen {
         val notificationScheduler = rememberNotificationScheduler()
         val databaseHelper = LocalDatabase.current
 
-        Scaffold { paddingValues ->
+        Scaffold { _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -67,7 +43,6 @@ class SettingsScreen : Screen {
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Top App Bar
                 NotedUpTopAppBar(
                     title = "Settings",
                     canShowNavigationIcon = true,
@@ -76,7 +51,6 @@ class SettingsScreen : Screen {
                     }
                 )
 
-                // Theme Toggle Card
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,7 +92,6 @@ class SettingsScreen : Screen {
                             )
                         }
 
-                        // Theme emoji indicator
                         Text(
                             text = if (settings.themeMode == ThemeMode.LIGHT) "🌞" else "🌙",
                             fontSize = 32.sp
@@ -126,7 +99,6 @@ class SettingsScreen : Screen {
                     }
                 }
 
-                // Notification Toggle Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -165,12 +137,9 @@ class SettingsScreen : Screen {
                             onCheckedChange = { enabled ->
                                 coroutineScope.launch {
                                     preferencesManager.updateNotificationsEnabled(enabled)
-
-                                    // If disabled, cancel all non-meeting notifications
                                     if (!enabled) {
                                         val allTasks = databaseHelper.getAllTasks()
                                         allTasks.forEach { task ->
-                                            // Only cancel non-meeting, undone tasks
                                             if (!task.isMeeting && !task.isDone) {
                                                 notificationScheduler.cancelNotification(task.timestampMillis)
                                             }
@@ -189,7 +158,6 @@ class SettingsScreen : Screen {
                     }
                 }
 
-                // Information text about meetings
                 Text(
                     text = "Note: Meeting tasks will always send notifications 15 minutes before, regardless of this setting.",
                     fontSize = 12.sp,

@@ -43,10 +43,6 @@ class AndroidNotificationScheduler(
         createNotificationChannel()
     }
 
-    /**
-     * Creates the notification channel for Android 8.0+.
-     * Sets high importance to ensure notifications are prominent.
-     */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -61,21 +57,15 @@ class AndroidNotificationScheduler(
         }
     }
 
-    /**
-     * Schedule a meeting notification to fire 15 minutes before the task's due time.
-     * If the notification time is in the past, it's silently ignored.
-     */
     override suspend fun scheduleMeetingNotification(task: TaskData) =
         withContext(Dispatchers.IO) {
             val notificationTime = task.timestampMillis - (MINUTES_BEFORE * 60 * 1000)
             val currentTime = System.currentTimeMillis()
 
             if (notificationTime <= currentTime) {
-                println("AndroidNotificationScheduler: Notification time is in the past, skipping")
                 return@withContext
             }
 
-            // Create intent to broadcast when alarm triggers
             val intent = Intent(context, MeetingNotificationReceiver::class.java).apply {
                 putExtra("taskTimestamp", task.timestampMillis)
                 putExtra("taskTitle", task.title)
@@ -84,7 +74,6 @@ class AndroidNotificationScheduler(
                 putExtra("is_meeting", true) // Mark as meeting
             }
 
-            // Use timestamp as unique request code for PendingIntent
             val requestCode = task.timestampMillis.toInt()
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -93,10 +82,8 @@ class AndroidNotificationScheduler(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            // Schedule alarm based on Android version capabilities
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // Android 12+: Check if we can schedule exact alarms
                     if (alarmManager.canScheduleExactAlarms()) {
                         alarmManager.setExactAndAllowWhileIdle(
                             AlarmManager.RTC_WAKEUP,
@@ -104,7 +91,6 @@ class AndroidNotificationScheduler(
                             pendingIntent
                         )
                     } else {
-                        println("AndroidNotificationScheduler: Cannot schedule exact alarms, using inexact alarm instead")
                         alarmManager.setAndAllowWhileIdle(
                             AlarmManager.RTC_WAKEUP,
                             notificationTime,
@@ -119,51 +105,37 @@ class AndroidNotificationScheduler(
                         pendingIntent
                     )
                 }
-                println("AndroidNotificationScheduler: Scheduled notification for '${task.title}' at $notificationTime")
             } catch (e: Exception) {
                 println("AndroidNotificationScheduler: Error scheduling alarm - ${e.message}")
             }
         }
 
-    /**
-     * Schedule a task notification based on task type and user preferences.
-     * - If task.isMeeting = true, always schedules notification (ignores notificationsEnabled)
-     * - If task.isMeeting = false and notificationsEnabled = true, schedules regular task notification
-     * - If task.isMeeting = false and notificationsEnabled = false, skips scheduling
-     */
     override suspend fun scheduleTaskNotification(task: TaskData, notificationsEnabled: Boolean) =
         withContext(Dispatchers.IO) {
-            // Meeting tasks always notify
             if (task.isMeeting) {
                 scheduleMeetingNotification(task)
                 return@withContext
             }
 
-            // Regular tasks only notify if enabled
             if (!notificationsEnabled) {
-                println("AndroidNotificationScheduler: Regular task notifications disabled, skipping")
                 return@withContext
             }
 
-            // Schedule regular task notification
             val notificationTime = task.timestampMillis - (MINUTES_BEFORE * 60 * 1000)
             val currentTime = System.currentTimeMillis()
 
             if (notificationTime <= currentTime) {
-                println("AndroidNotificationScheduler: Notification time is in the past, skipping")
                 return@withContext
             }
 
-            // Create intent to broadcast when alarm triggers
             val intent = Intent(context, MeetingNotificationReceiver::class.java).apply {
                 putExtra("taskTimestamp", task.timestampMillis)
                 putExtra("taskTitle", task.title)
                 putExtra("taskSubtitle", task.subtitle)
                 putExtra("task_meeting_link", task.meetingLink)
-                putExtra("is_meeting", false) // Mark as regular task
+                putExtra("is_meeting", false)
             }
 
-            // Use timestamp as unique request code for PendingIntent
             val requestCode = task.timestampMillis.toInt()
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -172,10 +144,8 @@ class AndroidNotificationScheduler(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            // Schedule alarm based on Android version capabilities
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // Android 12+: Check if we can schedule exact alarms
                     if (alarmManager.canScheduleExactAlarms()) {
                         alarmManager.setExactAndAllowWhileIdle(
                             AlarmManager.RTC_WAKEUP,
@@ -183,7 +153,6 @@ class AndroidNotificationScheduler(
                             pendingIntent
                         )
                     } else {
-                        println("AndroidNotificationScheduler: Cannot schedule exact alarms, using inexact alarm instead")
                         alarmManager.setAndAllowWhileIdle(
                             AlarmManager.RTC_WAKEUP,
                             notificationTime,
@@ -191,23 +160,17 @@ class AndroidNotificationScheduler(
                         )
                     }
                 } else {
-                    // Android 11 and below
                     alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         notificationTime,
                         pendingIntent
                     )
                 }
-                println("AndroidNotificationScheduler: Scheduled regular task notification for '${task.title}' at $notificationTime")
             } catch (e: Exception) {
                 println("AndroidNotificationScheduler: Error scheduling alarm - ${e.message}")
             }
         }
 
-    /**
-     * Cancel a previously scheduled notification.
-     * Uses the task timestamp to identify and cancel the correct alarm.
-     */
     override suspend fun cancelNotification(taskTimestamp: Long) = withContext(Dispatchers.IO) {
         val intent = Intent(context, MeetingNotificationReceiver::class.java)
         val requestCode = taskTimestamp.toInt()
@@ -221,17 +184,11 @@ class AndroidNotificationScheduler(
         try {
             alarmManager.cancel(pendingIntent)
             pendingIntent.cancel()
-            println("AndroidNotificationScheduler: Cancelled notification for $taskTimestamp")
         } catch (e: Exception) {
             println("AndroidNotificationScheduler: Error cancelling alarm - ${e.message}")
         }
     }
 
-    /**
-     * Check if POST_NOTIFICATIONS permission is granted on Android 13+.
-     * On older versions, the permission is not required.
-     * Does not show any permission dialog - only checks current status.
-     */
     override suspend fun checkPermissionStatus(): Boolean = withContext(Dispatchers.IO) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val hasPermission = ActivityCompat.checkSelfPermission(
@@ -239,22 +196,13 @@ class AndroidNotificationScheduler(
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
 
-            println("AndroidNotificationScheduler: Permission status - granted = $hasPermission")
             hasPermission
         } else {
-            // Permission not required on older Android versions (pre-Android 13)
             println("AndroidNotificationScheduler: Running on Android < 13, permission not required")
             true
         }
     }
 
-    /**
-     * Check POST_NOTIFICATIONS permission on Android 13+.
-     * Note: On Android, this method can only CHECK permission status.
-     * To actually REQUEST permission from the user, the Activity must use
-     * ActivityCompat.requestPermissions() or rememberLauncherForActivityResult in Compose.
-     * On older Android versions, the permission is not required and returns true.
-     */
     override suspend fun requestPermission(): Boolean = withContext(Dispatchers.IO) {
         val hasPermission = checkPermissionStatus()
 
@@ -266,22 +214,11 @@ class AndroidNotificationScheduler(
         hasPermission
     }
 
-    /**
-     * Cancel all scheduled notifications.
-     * Not fully implemented - would require tracking all notification IDs.
-     */
     override suspend fun cancelAllNotifications() {
-        // TODO: Implement if needed for full notification cleanup
         println("AndroidNotificationScheduler: cancelAllNotifications() called")
     }
 }
 
-/**
- * BroadcastReceiver that handles notification display when alarm triggers.
- * Called when the scheduled alarm fires and displays the notification to the user.
- * Clicking the notification opens the app to the task details screen.
- * The notification is automatically cancelled after being displayed (fires only once).
- */
 class MeetingNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val taskTimestamp = intent.getLongExtra("taskTimestamp", 0L)
@@ -290,10 +227,6 @@ class MeetingNotificationReceiver : BroadcastReceiver() {
         val taskMeetingLink = intent.getStringExtra("task_meeting_link") ?: ""
         val isMeeting = intent.getBooleanExtra("is_meeting", true) // Default true for backward compatibility
 
-        println("MeetingNotificationReceiver: Received notification for '$taskTitle' (isMeeting=$isMeeting)")
-
-        // Create intent to open MainActivity with task timestamp
-        // This will be handled by MainActivity to navigate to the task details
         val notificationIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("openTaskTimestamp", taskTimestamp)
@@ -306,14 +239,12 @@ class MeetingNotificationReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Build notification with user-friendly message
         val notificationText = if (taskMeetingLink.isNotEmpty()) {
             "$taskSubtitle\n\nMeeting Link: $taskMeetingLink"
         } else {
             taskSubtitle
         }
 
-        // Set title based on task type
         val notificationTitle = if (isMeeting) {
             "Meeting: $taskTitle starts in 15 minutes"
         } else {
@@ -330,7 +261,6 @@ class MeetingNotificationReceiver : BroadcastReceiver() {
             .setContentIntent(pendingIntent)
             .build()
 
-        // Show notification
         try {
             if (ActivityCompat.checkSelfPermission(
                     context,
@@ -338,9 +268,7 @@ class MeetingNotificationReceiver : BroadcastReceiver() {
                 ) == PackageManager.PERMISSION_GRANTED || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
             ) {
                 NotificationManagerCompat.from(context).notify(taskTimestamp.toInt(), notification)
-                println("MeetingNotificationReceiver: Displayed notification for '$taskTitle'")
 
-                // Cancel the notification after displaying it (ensures it only fires once)
                 val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val cancelIntent = Intent(context, MeetingNotificationReceiver::class.java)
                 val cancelPendingIntent = PendingIntent.getBroadcast(
@@ -350,7 +278,6 @@ class MeetingNotificationReceiver : BroadcastReceiver() {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
                 alarmManager.cancel(cancelPendingIntent)
-                println("MeetingNotificationReceiver: Cancelled recurring alarm for '$taskTitle'")
             } else {
                 println("MeetingNotificationReceiver: POST_NOTIFICATIONS permission not granted")
             }
@@ -360,10 +287,6 @@ class MeetingNotificationReceiver : BroadcastReceiver() {
     }
 }
 
-/**
- * Composable provider for NotificationScheduler on Android.
- * Returns an AndroidNotificationScheduler instance initialized with the current context.
- */
 @Composable
 actual fun rememberNotificationScheduler(): NotificationScheduler {
     val context = LocalContext.current

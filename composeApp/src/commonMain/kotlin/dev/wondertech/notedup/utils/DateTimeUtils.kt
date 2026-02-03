@@ -1,12 +1,10 @@
 package dev.wondertech.notedup.utils
 
-import kotlinx.datetime.Instant
+import kotlinx.datetime.*
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.number
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 object DateTimeUtils {
@@ -19,7 +17,7 @@ object DateTimeUtils {
         minute: Int
     ): Long {
         val localDateTime = LocalDateTime(
-            date.year, date.monthNumber, date.dayOfMonth,
+            date.year, date.month.number, date.day,
             hour, minute, 0, 0
         )
         return localDateTime.toInstant(TimeZone.currentSystemDefault())
@@ -62,37 +60,6 @@ object DateTimeUtils {
         return getHourFromMillis(millis)
     }
 
-    /**
-     * Formats time for display (e.g., "3:30 PM")
-     */
-    fun formatTime(millis: Long): String {
-        val dateTime = millisToLocalDateTime(millis)
-        val hour = dateTime.hour
-        val minute = dateTime.minute
-        val amPm = if (hour < 12) "AM" else "PM"
-        val displayHour = when (hour) {
-            0 -> 12
-            in 1..12 -> hour
-            else -> hour - 12
-        }
-        return "$displayHour:${minute.toString().padStart(2, '0')} $amPm"
-    }
-
-    /**
-     * Formats date for display (e.g., "Dec 27, 2024")
-     */
-    fun formatDate(date: LocalDate): String {
-        val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
-        return "${monthName.take(3)} ${date.dayOfMonth}, ${date.year}"
-    }
-
-    /**
-     * Formats full date and time for display (e.g., "2024-12-27 3:30 PM")
-     */
-    fun formatDateTime(millis: Long): String {
-        val dateTime = millisToLocalDateTime(millis)
-        return "${dateTime.date} ${formatTime(millis)}"
-    }
 
     /**
      * Checks if a task is overdue based on its deadline timestamp.

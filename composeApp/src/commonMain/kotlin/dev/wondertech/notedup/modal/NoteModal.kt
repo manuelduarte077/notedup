@@ -1,7 +1,7 @@
 package dev.wondertech.notedup.modal
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
 
@@ -24,11 +24,13 @@ data class NoteData(
      */
     val formattedDate: String
         get() {
-            val instant = Instant.fromEpochMilliseconds(timestampMillis)
+            val instant = kotlin.time.Instant.fromEpochMilliseconds(timestampMillis)
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-            val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-            val monthName = monthNames.getOrNull(dateTime.monthNumber - 1) ?: dateTime.monthNumber.toString()
-            return "$monthName ${dateTime.dayOfMonth}, ${dateTime.year}"
+            val monthNames = listOf(
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            )
+            val monthName = monthNames.getOrNull(dateTime.month.number - 1) ?: dateTime.month.number.toString()
+            return "$monthName ${dateTime.day}, ${dateTime.year}"
         }
 }
