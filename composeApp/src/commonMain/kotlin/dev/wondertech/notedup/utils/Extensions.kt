@@ -29,7 +29,6 @@ fun Long.formatTimeDisplay(): String {
     val hour24 = dateTime.hour
     val minute = dateTime.minute
 
-    // Convert to 12-hour format
     val (hour12, amPm) = when {
         hour24 == 0 -> Pair(12, "AM")
         hour24 < 12 -> Pair(hour24, "AM")

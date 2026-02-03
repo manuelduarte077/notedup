@@ -166,7 +166,7 @@ fun RowScope.ContentItem(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = date.date.dayOfMonth.toString(),
+            text = date.date.day.toString(),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,

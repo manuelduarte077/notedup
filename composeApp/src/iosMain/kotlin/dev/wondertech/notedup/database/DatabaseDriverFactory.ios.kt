@@ -3,16 +3,7 @@ package dev.wondertech.notedup.database
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 
-/**
- * iOS implementation of database driver factory.
- * No context parameter needed for iOS native driver.
- */
 actual class DatabaseDriverFactory {
-    /**
-     * Creates an iOS native SQLite driver for the task database.
-     *
-     * @return SqlDriver instance configured for iOS platform
-     */
     actual fun createDriver(): SqlDriver {
         val driver = NativeSqliteDriver(NotedUpDatabase.Schema, "notedup.db")
 

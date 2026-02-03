@@ -21,23 +21,18 @@ actual fun NativeDatePicker(
         dispatch_async(dispatch_get_main_queue()) {
             val alertController = UIAlertController.alertControllerWithTitle(
                 title = "Select Date",
-                message = "\n\n\n\n\n\n\n\n",  // Space for date picker
+                message = "\n\n\n\n\n\n\n\n",
                 preferredStyle = UIAlertControllerStyleAlert
             )
 
-            // Style alert controller view
             alertController.view.tintColor = primaryVariantColor
 
-            // Create UIDatePicker
             val datePicker = UIDatePicker().apply {
                 setDatePickerMode(UIDatePickerMode.UIDatePickerModeDate)
                 setPreferredDatePickerStyle(UIDatePickerStyle.UIDatePickerStyleWheels)
-
-                // Apply brand color tint
                 setTintColor(primaryColor)
                 setValue(primaryColor, forKey = "textColor")
 
-                // Set initial date
                 val components = NSDateComponents().apply {
                     year = initialYear.toLong()
                     month = initialMonth.toLong()
@@ -47,7 +42,6 @@ actual fun NativeDatePicker(
                 val initialDate = calendar.dateFromComponents(components)
                 initialDate?.let { setDate(it) }
 
-                // Frame positioning
                 setFrame(platform.CoreGraphics.CGRectMake(0.0, 50.0, 270.0, 150.0))
             }
 

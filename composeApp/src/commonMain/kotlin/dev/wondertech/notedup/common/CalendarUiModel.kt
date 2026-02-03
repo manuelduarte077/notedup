@@ -2,7 +2,6 @@ package dev.wondertech.notedup.common
 
 import kotlinx.datetime.LocalDate
 
-
 data class CalendarUiModel(
     val selectedDate: Date,
     val visibleDates: List<Date>

@@ -11,13 +11,6 @@ class CalendarDataSource {
     val today: LocalDate
         get() = todayDate()
 
-    /**
-     * Generates calendar data for a week starting from the specified date
-     *
-     * @param startDate The first date to display in the calendar
-     * @param lastSelectedDate The date that should be marked as selected
-     * @return CalendarUiModel containing the week's dates and selection state
-     */
     fun getData(
         startDate: LocalDate = today,
         lastSelectedDate: LocalDate
@@ -35,13 +28,6 @@ class CalendarDataSource {
         )
     }
 
-    /**
-     * Converts a LocalDate to a CalendarUiModel.Date
-     *
-     * @param date The date to convert
-     * @param isSelected Whether this date should be marked as selected
-     * @return CalendarUiModel.Date with appropriate flags set
-     */
     private fun toItem(date: LocalDate, isSelected: Boolean) =
         CalendarUiModel.Date(
             date = date,

@@ -69,14 +69,14 @@ fun NotedUpTopAppBar(
         )
 
         if (otherIcon != null) {
-            TaskarooRoundedIcon(
+            NotedUpRoundedIcon(
                 icon = otherIcon, getAddButtonClick = {
                     onOtherIconClick()
                 })
         }
 
         if (trailingIcon != null) {
-            TaskarooRoundedIcon(
+            NotedUpRoundedIcon(
                 icon = trailingIcon, getAddButtonClick = {
                     onTrailingIconClick()
                 })
@@ -84,15 +84,6 @@ fun NotedUpTopAppBar(
     }
 }
 
-/**
- * Alert dialog for confirming item deletion
- *
- * @param showDialog Whether the dialog should be displayed
- * @param taskTitle The title of the item to be deleted
- * @param itemType The type of item being deleted (default: "Task")
- * @param onDismiss Callback invoked when dialog is dismissed or cancelled
- * @param onConfirm Callback invoked when user confirms deletion
- */
 @Composable
 fun DeleteConfirmationDialog(
     showDialog: Boolean, taskTitle: String, itemType: String = "Task", onDismiss: () -> Unit, onConfirm: () -> Unit
@@ -131,14 +122,8 @@ fun DeleteConfirmationDialog(
     }
 }
 
-/**
- * Circular icon button with transparent background and border
- *
- * @param icon The drawable resource for the icon
- * @param getAddButtonClick Callback invoked when the icon is clicked
- */
 @Composable
-fun TaskarooRoundedIcon(icon: DrawableResource, getAddButtonClick: () -> Unit) {
+fun NotedUpRoundedIcon(icon: DrawableResource, getAddButtonClick: () -> Unit) {
     Surface(
         modifier = Modifier.clip(CircleShape).clickable {
             getAddButtonClick()
@@ -158,15 +143,6 @@ fun TaskarooRoundedIcon(icon: DrawableResource, getAddButtonClick: () -> Unit) {
     }
 }
 
-/**
- * Compact task card displaying task title, items, and deadline
- *
- * @param modifier Modifier to apply to the card
- * @param taskData The task data to display
- * @param onTaskItemToggle Callback invoked when a task item checkbox is toggled
- * @param onClick Callback invoked when the card is clicked
- * @param onLongClick Callback invoked when the card is long-pressed
- */
 @Composable
 fun TaskCardConcise(
     modifier: Modifier,
@@ -267,14 +243,6 @@ fun TaskCardConcise(
 }
 
 
-/**
- * Full-featured task card with title, subtitle, priority, deadline, and progress tracking
- *
- * @param taskData The task data to display
- * @param onTaskItemToggle Callback invoked when a task item checkbox is toggled
- * @param onClick Callback invoked when the card is clicked
- * @param onLongClick Callback invoked when the card is long-pressed
- */
 @Composable
 fun TaskCard(
     taskData: TaskData,
@@ -317,7 +285,7 @@ fun TaskCard(
 
                 Spacer(Modifier.height(16.dp))
 
-                TaskarooStatusBadge(
+                NotedUpStatusBadge(
                     status = taskData.isDone.toTaskStatus(),
                     isOverdue = isTaskOverdue(taskData.timestampMillis),
                     onStatusChange = { newStatus ->
@@ -409,12 +377,7 @@ fun TaskCard(
     }
 }
 
-/**
- * Custom circular checkbox with animated check mark
- * @param checked Whether the checkbox is currently checked
- * @param onCheckedChange Callback invoked when checkbox state changes
- * @param modifier Modifier to apply to the checkbox
- */
+
 @Composable
 fun CircularCheckbox(
     checked: Boolean, onCheckedChange: (Boolean) -> Unit, uncheckColor: Color, modifier: Modifier = Modifier
@@ -454,35 +417,19 @@ fun CircularCheckbox(
     }
 }
 
-/**
- * Task Status enum representing the completion status of a task
- *
- * @property displayName The user-facing display name for the status
- * @property isCompleted Whether this status represents a completed task
- */
+
 enum class TaskStatus(val displayName: String, val isCompleted: Boolean) {
-    /** Task is not yet completed */
     UNDONE("Undone", false),
-
-    /** Task has been completed */
     COMPLETED("Done", true),
-
-    /** Task is undone and past its deadline */
     OVERDUE("Overdue", false)
 }
 
-/**
- * Extension function to convert Boolean to TaskStatus
- */
 fun Boolean.toTaskStatus() = if (this) TaskStatus.COMPLETED else TaskStatus.UNDONE
 
-/**
- * Extension function to convert TaskStatus to Boolean
- */
 fun TaskStatus.toBoolean() = this.isCompleted
 
 @Composable
-fun TaskarooStatusBadge(
+fun NotedUpStatusBadge(
     status: TaskStatus,
     isOverdue: Boolean,
     onStatusChange: (TaskStatus) -> Unit,
@@ -558,7 +505,6 @@ fun TaskarooStatusBadge(
         )
     }
 }
-
 
 @Composable
 fun TaskStatusDialog(
@@ -678,13 +624,6 @@ private fun StatusOptionCard(
 }
 
 
-/**
- * Individual task item row with checkbox and text
- *
- * @param taskItem The task item data to display
- * @param isConciseItem Whether to use smaller sizing for compact layout
- * @param onToggle Callback invoked when the checkbox is toggled
- */
 @Composable
 fun TaskItemRow(
     modifier: Modifier = Modifier,

@@ -35,9 +35,11 @@ import dev.wondertech.notedup.utils.todayDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
+import kotlinx.datetime.number
 import notedup.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
 class CreateTaskScreen(
@@ -65,7 +67,6 @@ class CreateTaskScreen(
             }
         }
 
-        // Form states
         var taskTitle by remember { mutableStateOf("") }
         var taskDescription by remember { mutableStateOf("") }
         var selectedDate by remember {
@@ -76,9 +77,8 @@ class CreateTaskScreen(
                 }"
             )
         }
-        // Default time is 1 hour ahead of current time
         var selectedHour by remember {
-            val now = kotlin.time.Instant.fromEpochMilliseconds(currentTimeMillis())
+            val now = Instant.fromEpochMilliseconds(currentTimeMillis())
             val currentDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
             val oneHourLater = currentDateTime.hour + 1
             val hour24 = if (oneHourLater >= 24) oneHourLater - 24 else oneHourLater
@@ -96,7 +96,7 @@ class CreateTaskScreen(
             mutableStateOf(currentDateTime.minute)
         }
         var selectedAmPm by remember {
-            val now = kotlin.time.Instant.fromEpochMilliseconds(currentTimeMillis())
+            val now = Instant.fromEpochMilliseconds(currentTimeMillis())
             val currentDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
             val oneHourLater = currentDateTime.hour + 1
             val hour24 = if (oneHourLater >= 24) oneHourLater - 24 else oneHourLater
@@ -111,28 +111,22 @@ class CreateTaskScreen(
         var isMeetingTask by remember { mutableStateOf(false) }
         var meetingLink by remember { mutableStateOf("") }
 
-        // Picker dialog states
         var showDatePicker by remember { mutableStateOf(false) }
         var showTimePicker by remember { mutableStateOf(false) }
 
-        // Task details checklist
         var taskDetailItems by remember { mutableStateOf(listOf("")) }
         val scrollState = rememberScrollState()
         val coroutineScope = rememberCoroutineScope()
         val notificationScheduler = rememberNotificationScheduler()
 
-        // Settings state for notification preferences
         val preferencesManager = remember { getPreferencesManager() }
         val settings by preferencesManager.settingsFlow.collectAsState(AppSettings())
 
-        // Error handling and loading state
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isSaving by remember { mutableStateOf(false) }
 
-        // Delete dialog state
         var showDeleteDialog by remember { mutableStateOf(false) }
 
-        // Conversion utility functions
         fun convertTo24Hour(hour12: Int, amPm: String): Int {
             return when {
                 amPm == "AM" && hour12 == 12 -> 0
@@ -176,20 +170,17 @@ class CreateTaskScreen(
                 isMeetingTask = task.isMeeting
                 meetingLink = task.meetingLink
 
-                // Extract date and time from timestamp
                 val instant = Instant.fromEpochMilliseconds(task.timestampMillis)
                 val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
                 selectedDate = "${dateTime.year}-${
-                    dateTime.monthNumber.toString().padStart(2, '0')
-                }-${dateTime.dayOfMonth.toString().padStart(2, '0')}"
+                    dateTime.month.number.toString().padStart(2, '0')
+                }-${dateTime.day.toString().padStart(2, '0')}"
 
-                // Convert 24-hour to 12-hour format
                 val (hour12, amPm) = convertTo12Hour(dateTime.hour)
                 selectedHour = hour12
                 selectedMinute = dateTime.minute
                 selectedAmPm = amPm
 
-                // Pre-fill checklist items
                 taskDetailItems = if (task.taskList.isEmpty()) {
                     listOf("")
                 } else {
@@ -198,7 +189,7 @@ class CreateTaskScreen(
             }
         }
 
-        Scaffold { innerPaddings ->
+        Scaffold { _ ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -241,7 +232,6 @@ class CreateTaskScreen(
                                     isSaving = true
                                     errorMessage = null
 
-                                    // Parse date from selectedDate string (format: YYYY-MM-DD)
                                     val dateParts = selectedDate.split("-")
                                     if (dateParts.size == 3) {
                                         val year = dateParts[0].toIntOrNull() ?: run {
@@ -260,7 +250,6 @@ class CreateTaskScreen(
                                             return@launch
                                         }
 
-                                        // Validate date components
                                         if (month !in 1..12) {
                                             errorMessage = "Month must be between 1-12"
                                             isSaving = false
@@ -272,8 +261,6 @@ class CreateTaskScreen(
                                             return@launch
                                         }
 
-                                        // Create LocalDateTime with selected date and time
-                                        // Convert 12-hour format to 24-hour for storage
                                         val hour24 = convertTo24Hour(selectedHour, selectedAmPm)
                                         val localDateTime = LocalDateTime(
                                             year, month, day,
@@ -287,7 +274,6 @@ class CreateTaskScreen(
                                                 .toInstant(TimeZone.currentSystemDefault())
                                                 .toEpochMilliseconds()
                                         }
-
 
                                         val taskItems = if (isEditMode) {
                                             val existingItems = existingTask?.taskList ?: emptyList()
@@ -401,7 +387,6 @@ class CreateTaskScreen(
                     }
                 }
 
-                // Meeting Toggle
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {

@@ -80,7 +80,6 @@ fun NotedUpBottomNavBar(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Home tab
                 BottomNavItem(
                     tab = tabs[0],
                     isSelected = selectedIndex == 0,
@@ -90,7 +89,6 @@ fun NotedUpBottomNavBar(
 
                 Spacer(modifier = Modifier.width(2.dp))
 
-                // Add task button (always active style)
                 AddTaskButton(
                     onClick = onAddTaskClick,
                     modifier = Modifier.weight(1f)
@@ -98,7 +96,6 @@ fun NotedUpBottomNavBar(
 
                 Spacer(modifier = Modifier.width(2.dp))
 
-                // Calendar tab
                 BottomNavItem(
                     tab = tabs[1],
                     isSelected = selectedIndex == 1,
@@ -127,7 +124,6 @@ private fun BottomNavItem(
         )
     )
 
-    // Smooth color transitions
     val iconColor by animateColorAsState(
         targetValue = if (isSelected) {
             MaterialTheme.colorScheme.primary
@@ -166,7 +162,6 @@ private fun BottomNavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Icon container with animations
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.scale(iconScale)
