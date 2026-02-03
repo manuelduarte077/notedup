@@ -1,7 +1,10 @@
 package dev.wondertech.notedup.utils
 
 import kotlinx.datetime.*
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 object DateTimeUtils {
@@ -14,7 +17,7 @@ object DateTimeUtils {
         minute: Int
     ): Long {
         val localDateTime = LocalDateTime(
-            date.year, date.monthNumber, date.dayOfMonth,
+            date.year, date.month.number, date.day,
             hour, minute, 0, 0
         )
         return localDateTime.toInstant(TimeZone.currentSystemDefault())

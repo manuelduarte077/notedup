@@ -64,7 +64,7 @@ fun NotedUpTopAppBar(
             modifier = Modifier.weight(1f),
             text = title,
             fontSize = 22.sp,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
 
@@ -670,16 +670,16 @@ fun TaskSummaryCards(
     onFilterSelected: (String) -> Unit = {}
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             SummaryCard(
                 title = "All",
                 count = totalTasks,
                 icon = Res.drawable.all_icon,
-                backgroundColor = Color(0xFF609CFC),
+                backgroundColor = Color(0xFF609CFC).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "All",
                 onClick = { onFilterSelected("All") },
                 modifier = Modifier.weight(1f)
@@ -689,7 +689,7 @@ fun TaskSummaryCards(
                 title = "Completed",
                 count = completedTasks,
                 icon = Res.drawable.completed_icon,
-                backgroundColor = Color(0xFFE8C254),
+                backgroundColor = Color(0xFFE8C254).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "Completed",
                 onClick = { onFilterSelected("Completed") },
                 modifier = Modifier.weight(1f)
@@ -703,7 +703,7 @@ fun TaskSummaryCards(
                 title = "Active",
                 count = activeTasks,
                 icon = Res.drawable.inprogress_icon,
-                backgroundColor = Color(0xFF41C4AA),
+                backgroundColor = Color(0xFF41C4AA).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "Active",
                 onClick = { onFilterSelected("Active") },
                 modifier = Modifier.weight(1f)
@@ -713,7 +713,7 @@ fun TaskSummaryCards(
                 title = "Overdue",
                 count = overdueTasks,
                 icon = Res.drawable.overdue_icon,
-                backgroundColor = Color(0xFFDE5151),
+                backgroundColor = Color(0xFFDE5151).copy(alpha = 0.7f),
                 isSelected = selectedFilter == "Overdue",
                 onClick = { onFilterSelected("Overdue") },
                 modifier = Modifier.weight(1f)
@@ -733,8 +733,10 @@ private fun SummaryCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.clip(RoundedCornerShape(16.dp)).clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) backgroundColor.copy(alpha = 0.9f)
             else backgroundColor
@@ -745,7 +747,10 @@ private fun SummaryCard(
         )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -763,12 +768,14 @@ private fun SummaryCard(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black
+                    text = title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black.copy(alpha = 0.7f),
                 )
                 Text(
                     text = "$count Tasks",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                 )
             }

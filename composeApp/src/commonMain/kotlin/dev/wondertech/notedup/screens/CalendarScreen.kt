@@ -20,8 +20,8 @@ import dev.wondertech.notedup.database.LocalDatabase
 import dev.wondertech.notedup.modal.TaskData
 import dev.wondertech.notedup.screens.components.HourColumnItem
 import dev.wondertech.notedup.utils.DateTimeUtils
-import dev.wondertech.notedup.utils.todayDate
 import dev.wondertech.notedup.utils.Utils.hoursList
+import dev.wondertech.notedup.utils.todayDate
 import kotlinx.coroutines.launch
 import notedup.composeapp.generated.resources.Res
 import notedup.composeapp.generated.resources.add_icon
@@ -77,7 +77,6 @@ class CalendarScreen : Screen {
 
                 HorizontalCalendar { newSelectedDate ->
                     selectedDate = newSelectedDate
-                    println("Selected date: $selectedDate")
                 }
 
                 val tasksByHour = remember(tasksForSelectedDate) {
@@ -136,8 +135,7 @@ class CalendarScreen : Screen {
                                     showDeleteDialog = false
                                     taskToDelete = null
                                 }
-                            } catch (e: Exception) {
-                                println("CalendarScreen: Error deleting task - ${e.message}")
+                            } catch (_: Exception) {
                                 showDeleteDialog = false
                                 taskToDelete = null
                             }

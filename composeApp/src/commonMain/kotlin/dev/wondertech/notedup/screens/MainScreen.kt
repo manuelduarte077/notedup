@@ -30,7 +30,6 @@ import dev.wondertech.notedup.utils.DateTimeUtils.isTaskOverdue
 import dev.wondertech.notedup.utils.currentTimeMillis
 import kotlinx.coroutines.launch
 import notedup.composeapp.generated.resources.Res
-import notedup.composeapp.generated.resources.edit_icon
 import notedup.composeapp.generated.resources.no_task
 import notedup.composeapp.generated.resources.settings_icon
 import org.jetbrains.compose.resources.painterResource
@@ -112,7 +111,6 @@ class MainScreen : Screen {
                 NotedUpTopAppBar(
                     title = "NotedUp",
                     canShowNavigationIcon = false,
-                    otherIcon = Res.drawable.edit_icon,
                     trailingIcon = Res.drawable.settings_icon,
                     onOtherIconClick = {
                         navigator.push(NotesScreen())
@@ -153,7 +151,7 @@ class MainScreen : Screen {
                             "Overdue" -> "Overdue Tasks"
                             else -> "Recent Tasks"
                         },
-                        fontSize = 17.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )

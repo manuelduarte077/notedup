@@ -1,14 +1,3 @@
-/**
- * Notes list screen displaying all notes in a 2-column grid.
- *
- * This screen serves as the main interface for viewing notes.
- * It displays notes in a staggered grid layout with title and date,
- * and provides a FAB for creating new notes.
- *
- * @author Muhammad Ali
- * @date 2026-01-28
- * @see <a href="https://muhammadali0092.netlify.app/">Portfolio</a>
- */
 package dev.wondertech.notedup.screens
 
 import androidx.compose.foundation.BorderStroke
@@ -57,7 +46,6 @@ class NotesScreen : Screen {
         var showDeleteDialog by remember { mutableStateOf(false) }
         var noteToDelete by remember { mutableStateOf<NoteData?>(null) }
 
-        // Load notes from database - re-fetch whenever this screen becomes the top screen
         LaunchedEffect(navigator.lastItem) {
             try {
                 isLoading = true

@@ -144,7 +144,7 @@ private fun TabContentWithAddTaskNavigation(
                         navigator.push(CreateTaskScreen(taskTimestampToEdit = null))
                     }
                 }
-                
+
                 LaunchedEffect(navigator.size) {
                     val isAtRoot = navigator.size == 1
                     onBottomBarVisibilityChange(isAtRoot)
@@ -152,6 +152,7 @@ private fun TabContentWithAddTaskNavigation(
                 SlideTransition(navigator)
             }
         }
+
         is BottomNavTab.CalendarTab -> {
             Navigator(CalendarScreen()) { navigator ->
                 LaunchedEffect(navigator) {
@@ -159,7 +160,7 @@ private fun TabContentWithAddTaskNavigation(
                         navigator.push(CreateTaskScreen(taskTimestampToEdit = null))
                     }
                 }
-                
+
                 LaunchedEffect(navigator.size) {
                     val isAtRoot = navigator.size == 1
                     onBottomBarVisibilityChange(isAtRoot)
