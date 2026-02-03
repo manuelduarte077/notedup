@@ -110,7 +110,7 @@ class MainScreen : Screen {
             ) {
 
                 NotedUpTopAppBar(
-                    title = "From to-do to done✨",
+                    title = "NotedUp",
                     canShowNavigationIcon = false,
                     otherIcon = Res.drawable.edit_icon,
                     trailingIcon = Res.drawable.settings_icon,
