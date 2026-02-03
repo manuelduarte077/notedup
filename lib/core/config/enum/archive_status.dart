@@ -1,1 +1,0 @@
-enum ArchiveStatus { archive, unarchive }
